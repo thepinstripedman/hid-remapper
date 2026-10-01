@@ -84,6 +84,9 @@ void extra_init() {
     parse_descriptor(FAKE_VID, FAKE_PID, fake_descriptor, sizeof(fake_descriptor), FAKE_INTERFACE, 0);
 }
 
+void post_tusb_init() {
+}
+
 uint32_t get_gpio_valid_pins_mask() {
     return GPIO_VALID_PINS_BASE & ~(
 #ifdef PICO_DEFAULT_UART_TX_PIN

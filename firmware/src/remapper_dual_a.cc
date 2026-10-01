@@ -82,6 +82,9 @@ void extra_init() {
     serial_init();
 }
 
+void post_tusb_init() {
+}
+
 uint32_t get_gpio_valid_pins_mask() {
     return GPIO_VALID_PINS_BASE & ~(
 #ifdef PICO_DEFAULT_UART_TX_PIN

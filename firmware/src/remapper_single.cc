@@ -28,6 +28,10 @@ void extra_init() {
     add_repeating_timer_us(-1000, manual_sof, NULL, &sof_timer);
 }
 
+void post_tusb_init() {
+    set_interval_override(interval_override);
+}
+
 uint32_t get_gpio_valid_pins_mask() {
     return GPIO_VALID_PINS_BASE & ~(
 #ifdef PICO_DEFAULT_UART_TX_PIN
@@ -80,6 +84,7 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
 
     descriptor_received_callback(vid, pid, desc_report, desc_len, (uint16_t) (dev_addr << 8) | instance, hub_port, itf_num);
 
+    set_interval_override(interval_override);
     tuh_hid_receive_report(dev_addr, instance);
 }
 

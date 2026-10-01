@@ -254,6 +254,7 @@ int main() {
     board_init();
     extra_init();
     tusb_init();
+    post_tusb_init();
     stdio_init_all();
 
     tud_sof_isr_set(sof_handler);
