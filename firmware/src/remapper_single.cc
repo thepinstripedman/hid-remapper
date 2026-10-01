@@ -10,6 +10,7 @@
 #include "out_report.h"
 #include "remapper.h"
 #include "tick.h"
+#include "interval_override.h"
 
 static bool __no_inline_not_in_flash_func(manual_sof)(repeating_timer_t* rt) {
     pio_usb_host_frame();
@@ -50,6 +51,7 @@ void read_report(bool* new_report, bool* tick) {
 }
 
 void interval_override_updated() {
+    set_interval_override(interval_override);
 }
 
 void flash_b_side() {
