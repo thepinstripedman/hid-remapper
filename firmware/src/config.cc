@@ -974,11 +974,8 @@ void handle_set_report1(uint8_t report_id, uint8_t const* buffer, uint16_t bufsi
                     partial_scroll_timeout = config->partial_scroll_timeout;
                     tap_hold_threshold = config->tap_hold_threshold;
                     gpio_debounce_time = config->gpio_debounce_time_ms * 1000;
-                    uint8_t prev_interval_override = interval_override;
                     interval_override = config->interval_override;
-                    if (prev_interval_override != interval_override) {
-                        interval_override_updated();
-                    }
+                    interval_override_updated();
                     our_descriptor_number = config->our_descriptor_number;
                     if (our_descriptor_number >= NOUR_DESCRIPTORS) {
                         our_descriptor_number = 0;

@@ -248,6 +248,7 @@ int main() {
 #endif
     tick_init();
     load_config(FLASH_CONFIG_IN_MEMORY);
+    interval_override_updated();
     our_descriptor = &our_descriptors[our_descriptor_number];
     parse_our_descriptor();
     set_mapping_from_config();
