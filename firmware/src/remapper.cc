@@ -15,6 +15,7 @@
 #include "globals.h"
 #include "our_descriptor.h"
 #include "platform.h"
+#include "interval_override.h"
 #include "remapper.h"
 
 #define MAX_REPORT_SIZE 64
@@ -1402,7 +1403,8 @@ void process_mapping(bool auto_repeat) {
                 break;
             }
             uint8_t prev = (or_tail + OR_BUFSIZE - 1) % OR_BUFSIZE;
-            if ((or_items > 0) &&
+            bool const fast_host_poll = (interval_override != 0) && (interval_override <= 8);
+            if (!fast_host_poll && (or_items > 0) &&
                 (outgoing_reports[prev][0] == report_id) &&
                 !differ_on_absolute(outgoing_reports[prev] + 1, reports[report_id], report_id)) {
                 aggregate_relative(outgoing_reports[prev] + 1, reports[report_id], report_id);

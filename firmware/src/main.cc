@@ -26,6 +26,7 @@
 #include "mcp4651.h"
 #include "our_descriptor.h"
 #include "platform.h"
+#include "interval_override.h"
 #include "remapper.h"
 #include "tick.h"
 
@@ -86,6 +87,14 @@ static void send_all_ready_reports() {
     while ((tud_hid_n_ready(0) || tud_suspended()) && has_pending_outgoing_reports()) {
         send_report(do_send_report);
     }
+}
+
+void host_hid_report_hook() {
+    if (interval_override == 0) {
+        return;
+    }
+    process_mapping(true);
+    send_all_ready_reports();
 }
 
 void gpio_pins_init() {
@@ -292,7 +301,10 @@ int main() {
             mcp4651_write();
 #endif
         }
-        if (tick || new_report) {
+        if (tick) {
+            process_mapping(true);
+            send_all_ready_reports();
+        } else if (new_report && interval_override == 0) {
             process_mapping(true);
             send_all_ready_reports();
         }

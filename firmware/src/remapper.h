@@ -26,6 +26,9 @@ void extra_init();
 void post_tusb_init();
 void read_report(bool* new_report, bool* tick);
 
+// Called from host HID receive path (Feather) after each CST report when polling fast.
+void host_hid_report_hook();
+
 void interval_override_updated();
 
 void parse_our_descriptor();
