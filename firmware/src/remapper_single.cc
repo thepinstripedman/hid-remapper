@@ -7,6 +7,7 @@
 #include "pico/time.h"
 
 #include "descriptor_parser.h"
+#include "hid_host.h"
 #include "out_report.h"
 #include "remapper.h"
 #include "tick.h"
@@ -46,11 +47,32 @@ uint32_t get_gpio_valid_pins_mask() {
 
 static bool reports_received;
 
+static void pump_host_hid_in(void) {
+    if (interval_override == 0) {
+        return;
+    }
+    for (uint8_t daddr = 1; daddr < CFG_TUH_DEVICE_MAX; daddr++) {
+        if (!tuh_mounted(daddr)) {
+            continue;
+        }
+        uint8_t const hid_count = tuh_hid_itf_get_count(daddr);
+        for (uint8_t idx = 0; idx < hid_count; idx++) {
+            if (tuh_hid_mounted(daddr, idx) && tuh_hid_receive_ready(daddr, idx)) {
+                tuh_hid_receive_report(daddr, idx);
+            }
+        }
+    }
+}
+
 void read_report(bool* new_report, bool* tick) {
     *tick = get_and_clear_tick_pending();
 
     reports_received = false;
+    if (*tick) {
+        pump_host_hid_in();
+    }
     tuh_task();
+    pump_host_hid_in();
     *new_report = reports_received;
 }
 
