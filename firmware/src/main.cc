@@ -89,14 +89,6 @@ static void send_all_ready_reports() {
     }
 }
 
-void host_hid_report_hook() {
-    if (interval_override == 0) {
-        return;
-    }
-    process_mapping(true);
-    send_all_ready_reports();
-}
-
 void gpio_pins_init() {
     gpio_valid_pins_mask = get_gpio_valid_pins_mask();
     gpio_init_mask(gpio_valid_pins_mask);
@@ -301,7 +293,7 @@ int main() {
             mcp4651_write();
 #endif
         }
-        if (tick || (new_report && interval_override == 0)) {
+        if (tick || new_report) {
             process_mapping(true);
             send_all_ready_reports();
         }

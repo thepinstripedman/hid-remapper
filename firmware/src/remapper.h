@@ -26,9 +26,6 @@ void extra_init();
 void post_tusb_init();
 void read_report(bool* new_report, bool* tick);
 
-// Map CST input to PC HID and send (Feather fast-poll path). Call outside tuh callbacks.
-void host_hid_report_hook();
-
 void interval_override_updated();
 
 void parse_our_descriptor();

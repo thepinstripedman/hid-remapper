@@ -46,10 +46,6 @@ uint32_t get_gpio_valid_pins_mask() {
 
 static bool reports_received;
 
-#ifndef HOST_TUH_BURST_MAX
-#define HOST_TUH_BURST_MAX 8
-#endif
-
 static void pump_host_hid_in(void) {
     if (interval_override == 0) {
         return;
@@ -70,24 +66,11 @@ static void pump_host_hid_in(void) {
 void read_report(bool* new_report, bool* tick) {
     *tick = get_and_clear_tick_pending();
 
-    *new_report = false;
-    uint8_t const burst_limit = (interval_override != 0) ? HOST_TUH_BURST_MAX : 1;
-    for (uint8_t burst = 0; burst < burst_limit; burst++) {
-        reports_received = false;
-        pump_host_hid_in();
-        tuh_task();
-        pump_host_hid_in();
-        if (reports_received) {
-            *new_report = true;
-            if (interval_override != 0) {
-                host_hid_report_hook();
-                tud_task();
-            }
-        }
-        if (!reports_received || interval_override == 0) {
-            break;
-        }
-    }
+    reports_received = false;
+    pump_host_hid_in();
+    tuh_task();
+    pump_host_hid_in();
+    *new_report = reports_received;
 }
 
 void interval_override_updated() {
