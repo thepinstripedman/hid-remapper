@@ -301,10 +301,7 @@ int main() {
             mcp4651_write();
 #endif
         }
-        if (tick) {
-            process_mapping(true);
-            send_all_ready_reports();
-        } else if (new_report && interval_override == 0) {
+        if (tick || (new_report && interval_override == 0)) {
             process_mapping(true);
             send_all_ready_reports();
         }
