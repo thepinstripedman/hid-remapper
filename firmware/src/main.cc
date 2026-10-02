@@ -82,6 +82,12 @@ bool do_send_report(uint8_t interface, const uint8_t* report_with_id, uint8_t le
     return true;  // XXX?
 }
 
+static void send_all_ready_reports() {
+    while ((tud_hid_n_ready(0) || tud_suspended()) && has_pending_outgoing_reports()) {
+        send_report(do_send_report);
+    }
+}
+
 void gpio_pins_init() {
     gpio_valid_pins_mask = get_gpio_valid_pins_mask();
     gpio_init_mask(gpio_valid_pins_mask);
@@ -281,11 +287,14 @@ int main() {
 #ifdef ADC_ENABLED
             read_adc();
 #endif
-            process_mapping(true);
             write_gpio();
 #ifdef MCP4651_ENABLED
             mcp4651_write();
 #endif
+        }
+        if (tick || new_report) {
+            process_mapping(true);
+            send_all_ready_reports();
         }
         tud_task();
         if (boot_protocol_updated) {
@@ -305,9 +314,7 @@ int main() {
             set_gpio_dir();
             set_gpio_dir_pending = false;
         }
-        if (tud_hid_n_ready(0) || tud_suspended()) {
-            send_report(do_send_report);
-        }
+        send_all_ready_reports();
         if (monitor_enabled && tud_hid_n_ready(1)) {
             send_monitor_report(do_send_report);
         }

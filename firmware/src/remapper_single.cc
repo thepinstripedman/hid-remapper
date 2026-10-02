@@ -67,9 +67,7 @@ void read_report(bool* new_report, bool* tick) {
     *tick = get_and_clear_tick_pending();
 
     reports_received = false;
-    if (*tick) {
-        pump_host_hid_in();
-    }
+    pump_host_hid_in();
     tuh_task();
     pump_host_hid_in();
     *new_report = reports_received;

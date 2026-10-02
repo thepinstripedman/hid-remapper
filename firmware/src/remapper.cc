@@ -1433,6 +1433,10 @@ void process_mapping(bool auto_repeat) {
     processing_time += get_time() - now;
 }
 
+bool has_pending_outgoing_reports() {
+    return or_items > 0;
+}
+
 bool send_report(send_report_t do_send_report) {
     if (suspended || (or_items == 0)) {
         return false;
