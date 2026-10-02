@@ -7,7 +7,6 @@
 #include "pico/time.h"
 
 #include "descriptor_parser.h"
-#include "hid_host.h"
 #include "out_report.h"
 #include "remapper.h"
 #include "tick.h"
