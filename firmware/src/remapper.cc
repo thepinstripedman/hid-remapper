@@ -1392,18 +1392,39 @@ void process_mapping(bool auto_repeat) {
         }
     }
 
+    bool const fast_host_poll = (interval_override != 0) && (interval_override <= 8);
+    static uint64_t last_fixed_publish_us = 0;
+    bool fixed_publish_due = false;
+    if (fast_host_poll && auto_repeat) {
+        uint64_t const publish_interval_us = (uint64_t) interval_override * 1000ULL;
+        if ((now - last_fixed_publish_us) >= publish_interval_us) {
+            fixed_publish_due = true;
+            last_fixed_publish_us = now;
+        }
+    }
+
     for (unsigned int i = 0; i < report_ids.size(); i++) {  // XXX what order should we go in? maybe keyboard first so that mappings to ctrl-left click work as expected?
         uint8_t report_id = report_ids[i];
         if (our_descriptor->sanitize_report != nullptr) {
             our_descriptor->sanitize_report(report_id, reports[report_id], report_sizes[report_id]);
         }
-        if (needs_to_be_sent(report_id)) {
+        bool has_relative = false;
+        if (report_masks_relative[report_id] != nullptr) {
+            for (unsigned int b = 0; b < report_sizes[report_id]; b++) {
+                if (report_masks_relative[report_id][b] != 0) {
+                    has_relative = true;
+                    break;
+                }
+            }
+        }
+        bool const should_send = needs_to_be_sent(report_id) ||
+            (fixed_publish_due && has_relative);
+        if (should_send) {
             if (or_items == OR_BUFSIZE) {
                 printf("overflow!\n");
                 break;
             }
             uint8_t prev = (or_tail + OR_BUFSIZE - 1) % OR_BUFSIZE;
-            bool const fast_host_poll = (interval_override != 0) && (interval_override <= 8);
             if (!fast_host_poll && (or_items > 0) &&
                 (outgoing_reports[prev][0] == report_id) &&
                 !differ_on_absolute(outgoing_reports[prev] + 1, reports[report_id], report_id)) {
